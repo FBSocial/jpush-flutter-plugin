@@ -54,7 +54,7 @@ public class JPushPlugin implements FlutterPlugin, MethodCallHandler, ActivityAw
     public void onAttachedToEngine(FlutterPluginBinding flutterPluginBinding) {
         MethodChannel  channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "jpush");
         channel.setMethodCallHandler(this);
-         context = flutterPluginBinding.getApplicationContext();
+        context = flutterPluginBinding.getApplicationContext();
         JPushHelper.getInstance().setMethodChannel(channel);
         JPushHelper.getInstance().setContext(context);
     }
@@ -110,7 +110,6 @@ public class JPushPlugin implements FlutterPlugin, MethodCallHandler, ActivityAw
             getAlias(call, result);
         } else if (call.method.equals("deleteAlias")) {
             deleteAlias(call, result);
-            ;
         } else if (call.method.equals("stopPush")) {
             stopPush(call, result);
         } else if (call.method.equals("resumePush")) {
@@ -333,8 +332,8 @@ public class JPushPlugin implements FlutterPlugin, MethodCallHandler, ActivityAw
 
     public void scheduleCache() {
         Log.d(TAG, "scheduleCache:");
-      JPushHelper.getInstance().dispatchNotification();
-      JPushHelper.getInstance().dispatchRid();
+        JPushHelper.getInstance().dispatchNotification();
+        JPushHelper.getInstance().dispatchRid();
     }
 
     public void setTags(MethodCall call, Result result) {
@@ -467,8 +466,8 @@ public class JPushPlugin implements FlutterPlugin, MethodCallHandler, ActivityAw
             HashMap<String, Object> map = call.arguments();
 
             JPushLocalNotification ln = new JPushLocalNotification();
-            ln.setBuilderId((Integer) map.get("buildId"));
-            ln.setNotificationId((Integer) map.get("id"));
+            ln.setBuilderId(((Number) map.get("buildId")).intValue());
+            ln.setNotificationId(((Number) map.get("id")).intValue());
             ln.setTitle((String) map.get("title"));
             ln.setContent((String) map.get("content"));
             HashMap<String, Object> extra = (HashMap<String, Object>) map.get("extra");

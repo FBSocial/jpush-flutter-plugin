@@ -144,6 +144,8 @@ static NSMutableArray<FlutterResult>* getRidResults;
         [self deleteAlias:call result:result];
     } else if([@"getAlias" isEqualToString:call.method]) {
         [self getAlias:call result:result];
+    }else if([@"getBadge" isEqualToString:call.method]) {
+        [self getBadge:call result:result];
     } else if([@"setBadge" isEqualToString:call.method]) {
         [self setBadge:call result:result];
     } else if([@"stopPush" isEqualToString:call.method]) {
@@ -322,6 +324,10 @@ static NSMutableArray<FlutterResult>* getRidResults;
     } seq: 0];
 }
 
+- (void)getBadge:(FlutterMethodCall*)call result:(FlutterResult)result {
+    result(@(UIApplication.sharedApplication.applicationIconBadgeNumber));
+}
+
 - (void)deleteAlias:(FlutterMethodCall*)call result:(FlutterResult)result {
     JPLog(@"deleteAlias:%@",call.arguments);
     [JPUSHService deleteAlias:^(NSInteger iResCode, NSString *iAlias, NSInteger seq) {
@@ -401,7 +407,8 @@ static NSMutableArray<FlutterResult>* getRidResults;
 
 - (void)getLaunchAppNotification:(FlutterMethodCall*)call result:(FlutterResult)result {
     JPLog(@"getLaunchAppNotification");
-    result(_launchNotification == nil ? @{}: _launchNotification);
+    result(_launchNotification == nil ? @{}: _launchNotification.copy);
+    _launchNotification = nil;
 }
 
 - (void)getRegistrationID:(FlutterMethodCall*)call result:(FlutterResult)result {
@@ -463,6 +470,15 @@ static NSMutableArray<FlutterResult>* getRidResults;
       content.relevanceScore = 1;
     }
     
+    if (params[@"soundName"] && ![params[@"soundName"] isEqualToString:@"<null>"]) {
+        content.sound = params[@"soundName"];
+    }
+    if (@available(iOS 15.0, *)) {
+         content.interruptionLevel = 1;
+    } else {
+            // Fallback on earlier versions
+    }
+
     JPushNotificationTrigger *trigger = [[JPushNotificationTrigger alloc] init];
     if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 10.0) {
         if (params[@"fireTime"]) {

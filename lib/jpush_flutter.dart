@@ -351,6 +351,10 @@ class JPush {
     await _channel.invokeMethod('setBadge', {"badge": badge});
   }
 
+  Future<int> getBadge() async {
+    return await _channel.invokeMethod('getBadge');
+  }
+
   ///
   /// 停止接收推送，调用该方法后应用将不再受到推送，如果想要重新收到推送可以调用 resumePush。
   ///
