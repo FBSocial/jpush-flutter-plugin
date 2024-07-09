@@ -183,10 +183,10 @@ static NSMutableArray<FlutterResult>* getRidResults;
 
 - (void)setCollectControl:(FlutterMethodCall*)call result:(FlutterResult)result {
     JPLog(@"setCollectControl:%@",call.arguments);
-    BOOL gps = [call.arguments[@"gps"] boolValue];
-    JPushCollectControl *control = [[JPushCollectControl alloc] init];
-    control.gps = gps;
-    [JPUSHService setCollectControl:control];
+//    BOOL gps = [call.arguments[@"gps"] boolValue];
+//    JPushCollectControl *control = [[JPushCollectControl alloc] init];
+//    control.gps = gps;
+//    [JPUSHService setCollectControl:control];
 }
 
 - (void)setup:(FlutterMethodCall*)call result:(FlutterResult)result {
