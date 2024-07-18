@@ -1,7 +1,7 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:platform/platform.dart';
 
 typedef Future<dynamic> EventHandler(Map<String, dynamic> event);
 
@@ -217,7 +217,7 @@ class JPush {
   ///
   Future<Map<dynamic, dynamic>> setTags(List<String> tags) async {
     print(flutter_log + "setTags:");
-    if (isOHOS) return;
+    if (isOHOS) return {};
     final Map<dynamic, dynamic> result =
         await _channel.invokeMethod('setTags', tags);
     return result;
@@ -231,7 +231,7 @@ class JPush {
   ///
   Future<Map<dynamic, dynamic>> cleanTags() async {
     print(flutter_log + "cleanTags:");
-    if (isOHOS) return;
+    if (isOHOS) return {};
 
     final Map<dynamic, dynamic> result =
         await _channel.invokeMethod('cleanTags');
@@ -248,7 +248,7 @@ class JPush {
 
   Future<Map<dynamic, dynamic>> addTags(List<String> tags) async {
     print(flutter_log + "addTags:");
-    if (isOHOS) return;
+    if (isOHOS) return {};
 
     final Map<dynamic, dynamic> result =
         await _channel.invokeMethod('addTags', tags);
@@ -264,7 +264,7 @@ class JPush {
   ///
   Future<Map<dynamic, dynamic>> deleteTags(List<String> tags) async {
     print(flutter_log + "deleteTags:");
-    if (isOHOS) return;
+    if (isOHOS) return {};
 
     final Map<dynamic, dynamic> result =
         await _channel.invokeMethod('deleteTags', tags);
@@ -279,7 +279,7 @@ class JPush {
   ///
   Future<Map<dynamic, dynamic>> getAllTags() async {
     print(flutter_log + "getAllTags:");
-    if (isOHOS) return;
+    if (isOHOS) return {};
 
     final Map<dynamic, dynamic> result =
         await _channel.invokeMethod('getAllTags');
@@ -294,7 +294,7 @@ class JPush {
   ///
   Future<Map<dynamic, dynamic>> getAlias() async {
     print(flutter_log + "getAlias:");
-    if (isOHOS) return;
+    if (isOHOS) return {};
     final Map<dynamic, dynamic> result =
         await _channel.invokeMethod('getAlias');
     return result;
@@ -310,7 +310,7 @@ class JPush {
   ///
   Future<Map<dynamic, dynamic>> setAlias(String alias) async {
     print(flutter_log + "setAlias:");
-    if (isOHOS) return;
+    if (isOHOS) return {};
 
     final Map<dynamic, dynamic> result =
         await _channel.invokeMethod('setAlias', alias);
@@ -330,7 +330,7 @@ class JPush {
   ///
   Future<Map<dynamic, dynamic>> deleteAlias() async {
     print(flutter_log + "deleteAlias:");
-    if (isOHOS) return;
+    if (isOHOS) return {};
 
     final Map<dynamic, dynamic> result =
         await _channel.invokeMethod('deleteAlias');
@@ -411,7 +411,7 @@ class JPush {
   /// @param {Function} callback = (Object) => {}
   ///
   Future<Map<dynamic, dynamic>> getLaunchAppNotification() async {
-    if (isOHOS) return;
+    if (isOHOS) return {};
     print(flutter_log + "getLaunchAppNotification:");
 
     final Map<dynamic, dynamic> result =
@@ -425,7 +425,7 @@ class JPush {
   /// @param {Function} callback = (String) => {}
   ///
   Future<String> getRegistrationID() async {
-    if (isOHOS) return;
+    if (isOHOS) return "";
     print(flutter_log + "getRegistrationID:");
 
     final String rid = await _channel.invokeMethod('getRegistrationID');
@@ -437,7 +437,7 @@ class JPush {
   /// @param {Notification} notification
   ///
   Future<String> sendLocalNotification(LocalNotification notification) async {
-    if (isOHOS) return;
+    if (isOHOS) return "";
     print(flutter_log + "sendLocalNotification:");
 
     await _channel.invokeMethod('sendLocalNotification', notification.toMap());
@@ -447,7 +447,7 @@ class JPush {
 
   /// 调用此 API 检测通知授权状态是否打开
   Future<bool> isNotificationEnabled() async {
-    if (isOHOS) return;
+    if (isOHOS) return false;
 
     final Map<dynamic, dynamic> result =
         await _channel.invokeMethod('isNotificationEnabled');
