@@ -7,6 +7,8 @@ typedef Future<dynamic> EventHandler(Map<String, dynamic> event);
 
 class JPush {
   static const String flutter_log = "| JPUSH | Flutter | ";
+  static bool get isOHOS =>
+      Platform.operatingSystem.toLowerCase().contains('ohos');
 
   factory JPush() => _instance;
 
@@ -35,6 +37,7 @@ class JPush {
     String channel = '',
     bool debug = false,
   }) {
+    if (isOHOS) return;
     print(flutter_log + "setup:");
 
     _channel.invokeMethod('setup', {
@@ -50,9 +53,8 @@ class JPush {
     String channelID = '',
     String sound = '',
   }) {
-    if (_platform.isIOS) {
-      return;
-    }
+    if (_platform.isIOS || isOHOS) return;
+
     print(flutter_log + "setChannelAndSound:");
 
     _channel.invokeMethod('setChannelAndSound',
@@ -61,46 +63,41 @@ class JPush {
 
   //APP活跃在前台时是否展示通知
   void setUnShowAtTheForeground({bool unShow = false}) {
+    if (isOHOS) return;
     print(flutter_log + "setUnShowAtTheForeground:");
     _channel.invokeMethod('setUnShowAtTheForeground', {'UnShow': unShow});
   }
 
   void setWakeEnable({bool enable = false}) {
+    if (isOHOS) return;
     _channel.invokeMethod('setWakeEnable', {'enable': enable});
   }
 
   void enableAutoWakeup({bool enable = false}) {
-    if (_platform.isIOS) {
-      return;
-    }
+    if (_platform.isIOS || isOHOS) return;
     _channel.invokeMethod('enableAutoWakeup', {'enable': enable});
   }
 
   void setAuth({bool enable = true}) {
+    if (isOHOS) return;
     print(flutter_log + "setAuth:");
     _channel.invokeMethod('setAuth', {'enable': enable});
   }
 
   void setLinkMergeEnable({bool enable = true}) {
-    if (_platform.isIOS) {
-      return;
-    }
+    if (_platform.isIOS || isOHOS) return;
     print(flutter_log + "setLinkMergeEnable:");
     _channel.invokeMethod('setLinkMergeEnable', {'enable': enable});
   }
 
   void setGeofenceEnable({bool enable = true}) {
-    if (_platform.isIOS) {
-      return;
-    }
+    if (_platform.isIOS || isOHOS) return;
     print(flutter_log + "setGeofenceEnable:");
     _channel.invokeMethod('setGeofenceEnable', {'enable': enable});
   }
 
   void setSmartPushEnable({bool enable = true}) {
-    if (_platform.isIOS) {
-      return;
-    }
+    if (_platform.isIOS || isOHOS) return;
     print(flutter_log + "setSmartPushEnable:");
     _channel.invokeMethod('setSmartPushEnable', {'enable': enable});
   }
@@ -188,10 +185,7 @@ class JPush {
   void applyPushAuthority(
       [NotificationSettingsIOS iosSettings = const NotificationSettingsIOS()]) {
     print(flutter_log + "applyPushAuthority:");
-
-    if (!_platform.isIOS) {
-      return;
-    }
+    if (!_platform.isIOS || isOHOS) return;
 
     _channel.invokeMethod('applyPushAuthority', iosSettings.toMap());
   }
@@ -200,9 +194,8 @@ class JPush {
   // 进入页面， pageName：页面名  请与pageLeave配套使用
   void pageEnterTo(String pageName) {
     print(flutter_log + "pageEnterTo:" + pageName);
-    if (!_platform.isIOS) {
-      return;
-    }
+    if (!_platform.isIOS || isOHOS) return;
+
     _channel.invokeMethod('pageEnterTo', pageName);
   }
 
@@ -210,9 +203,8 @@ class JPush {
   // 离开页面，pageName：页面名， 请与pageEnterTo配套使用
   void pageLeave(String pageName) {
     print(flutter_log + "pageLeave:" + pageName);
-    if (!_platform.isIOS) {
-      return;
-    }
+    if (!_platform.isIOS || isOHOS) return;
+
     _channel.invokeMethod('pageLeave', pageName);
   }
 
@@ -225,7 +217,7 @@ class JPush {
   ///
   Future<Map<dynamic, dynamic>> setTags(List<String> tags) async {
     print(flutter_log + "setTags:");
-
+    if (isOHOS) return;
     final Map<dynamic, dynamic> result =
         await _channel.invokeMethod('setTags', tags);
     return result;
@@ -239,6 +231,7 @@ class JPush {
   ///
   Future<Map<dynamic, dynamic>> cleanTags() async {
     print(flutter_log + "cleanTags:");
+    if (isOHOS) return;
 
     final Map<dynamic, dynamic> result =
         await _channel.invokeMethod('cleanTags');
@@ -255,6 +248,7 @@ class JPush {
 
   Future<Map<dynamic, dynamic>> addTags(List<String> tags) async {
     print(flutter_log + "addTags:");
+    if (isOHOS) return;
 
     final Map<dynamic, dynamic> result =
         await _channel.invokeMethod('addTags', tags);
@@ -270,6 +264,7 @@ class JPush {
   ///
   Future<Map<dynamic, dynamic>> deleteTags(List<String> tags) async {
     print(flutter_log + "deleteTags:");
+    if (isOHOS) return;
 
     final Map<dynamic, dynamic> result =
         await _channel.invokeMethod('deleteTags', tags);
@@ -284,6 +279,7 @@ class JPush {
   ///
   Future<Map<dynamic, dynamic>> getAllTags() async {
     print(flutter_log + "getAllTags:");
+    if (isOHOS) return;
 
     final Map<dynamic, dynamic> result =
         await _channel.invokeMethod('getAllTags');
@@ -298,6 +294,7 @@ class JPush {
   ///
   Future<Map<dynamic, dynamic>> getAlias() async {
     print(flutter_log + "getAlias:");
+    if (isOHOS) return;
     final Map<dynamic, dynamic> result =
         await _channel.invokeMethod('getAlias');
     return result;
@@ -313,6 +310,7 @@ class JPush {
   ///
   Future<Map<dynamic, dynamic>> setAlias(String alias) async {
     print(flutter_log + "setAlias:");
+    if (isOHOS) return;
 
     final Map<dynamic, dynamic> result =
         await _channel.invokeMethod('setAlias', alias);
@@ -332,6 +330,7 @@ class JPush {
   ///
   Future<Map<dynamic, dynamic>> deleteAlias() async {
     print(flutter_log + "deleteAlias:");
+    if (isOHOS) return;
 
     final Map<dynamic, dynamic> result =
         await _channel.invokeMethod('deleteAlias');
@@ -347,6 +346,7 @@ class JPush {
   ///
   Future setBadge(int badge) async {
     print(flutter_log + "setBadge:");
+    if (isOHOS) return;
 
     await _channel.invokeMethod('setBadge', {"badge": badge});
   }
@@ -360,6 +360,7 @@ class JPush {
   ///
   Future stopPush() async {
     print(flutter_log + "stopPush:");
+    if (isOHOS) return;
 
     await _channel.invokeMethod('stopPush');
   }
@@ -369,6 +370,7 @@ class JPush {
   ///
   Future resumePush() async {
     print(flutter_log + "resumePush:");
+    if (isOHOS) return;
 
     await _channel.invokeMethod('resumePush');
   }
@@ -378,14 +380,14 @@ class JPush {
   ///
   Future clearAllNotifications() async {
     print(flutter_log + "clearAllNotifications:");
+    if (isOHOS) return;
 
     await _channel.invokeMethod('clearAllNotifications');
   }
 
   Future clearLocalNotifications() async {
-    if (_platform.isIOS) {
-      return;
-    }
+    if (_platform.isIOS || isOHOS) return;
+
     print(flutter_log + "clearLocalNotifications:");
     await _channel.invokeMethod('clearLocalNotifications');
   }
@@ -395,6 +397,8 @@ class JPush {
   /// @param notificationId 通知 id，即：LocalNotification id
   ///
   void clearNotification({int notificationId = 0}) {
+    if (isOHOS) return;
+
     print(flutter_log + "clearNotification:");
     _channel.invokeListMethod("clearNotification", notificationId);
   }
@@ -407,6 +411,7 @@ class JPush {
   /// @param {Function} callback = (Object) => {}
   ///
   Future<Map<dynamic, dynamic>> getLaunchAppNotification() async {
+    if (isOHOS) return;
     print(flutter_log + "getLaunchAppNotification:");
 
     final Map<dynamic, dynamic> result =
@@ -420,6 +425,7 @@ class JPush {
   /// @param {Function} callback = (String) => {}
   ///
   Future<String> getRegistrationID() async {
+    if (isOHOS) return;
     print(flutter_log + "getRegistrationID:");
 
     final String rid = await _channel.invokeMethod('getRegistrationID');
@@ -431,6 +437,7 @@ class JPush {
   /// @param {Notification} notification
   ///
   Future<String> sendLocalNotification(LocalNotification notification) async {
+    if (isOHOS) return;
     print(flutter_log + "sendLocalNotification:");
 
     await _channel.invokeMethod('sendLocalNotification', notification.toMap());
@@ -440,6 +447,8 @@ class JPush {
 
   /// 调用此 API 检测通知授权状态是否打开
   Future<bool> isNotificationEnabled() async {
+    if (isOHOS) return;
+
     final Map<dynamic, dynamic> result =
         await _channel.invokeMethod('isNotificationEnabled');
     bool isEnabled = result["isEnabled"];
@@ -448,13 +457,13 @@ class JPush {
 
   /// 调用此 API 跳转至系统设置中应用设置界面
   void openSettingsForNotification() {
+    if (isOHOS) return;
     _channel.invokeMethod('openSettingsForNotification');
   }
 
   void requestRequiredPermission() {
-    if (_platform.isIOS) {
-      return;
-    }
+    if (_platform.isIOS || isOHOS) return;
+
     _channel.invokeMethod('requestRequiredPermission');
   }
 }
