@@ -13,15 +13,12 @@ class JPush {
   factory JPush() => _instance;
 
   final MethodChannel _channel;
-  final Platform _platform;
 
   @visibleForTesting
-  JPush.private(MethodChannel channel, Platform platform)
-      : _channel = channel,
-        _platform = platform;
+  JPush.private(MethodChannel channel, Platform platform) : _channel = channel;
 
   static final JPush _instance =
-      new JPush.private(const MethodChannel('jpush'), const LocalPlatform());
+      new JPush.private(const MethodChannel('jpush'));
 
   EventHandler? _onReceiveNotification;
   EventHandler? _onOpenNotification;
@@ -53,7 +50,7 @@ class JPush {
     String channelID = '',
     String sound = '',
   }) {
-    if (_platform.isIOS || isOHOS) return;
+    if (Platform.isIOS || isOHOS) return;
 
     print(flutter_log + "setChannelAndSound:");
 
@@ -74,7 +71,7 @@ class JPush {
   }
 
   void enableAutoWakeup({bool enable = false}) {
-    if (_platform.isIOS || isOHOS) return;
+    if (Platform.isIOS || isOHOS) return;
     _channel.invokeMethod('enableAutoWakeup', {'enable': enable});
   }
 
@@ -85,19 +82,19 @@ class JPush {
   }
 
   void setLinkMergeEnable({bool enable = true}) {
-    if (_platform.isIOS || isOHOS) return;
+    if (Platform.isIOS || isOHOS) return;
     print(flutter_log + "setLinkMergeEnable:");
     _channel.invokeMethod('setLinkMergeEnable', {'enable': enable});
   }
 
   void setGeofenceEnable({bool enable = true}) {
-    if (_platform.isIOS || isOHOS) return;
+    if (Platform.isIOS || isOHOS) return;
     print(flutter_log + "setGeofenceEnable:");
     _channel.invokeMethod('setGeofenceEnable', {'enable': enable});
   }
 
   void setSmartPushEnable({bool enable = true}) {
-    if (_platform.isIOS || isOHOS) return;
+    if (Platform.isIOS || isOHOS) return;
     print(flutter_log + "setSmartPushEnable:");
     _channel.invokeMethod('setSmartPushEnable', {'enable': enable});
   }
@@ -185,7 +182,7 @@ class JPush {
   void applyPushAuthority(
       [NotificationSettingsIOS iosSettings = const NotificationSettingsIOS()]) {
     print(flutter_log + "applyPushAuthority:");
-    if (!_platform.isIOS || isOHOS) return;
+    if (!Platform.isIOS) return;
 
     _channel.invokeMethod('applyPushAuthority', iosSettings.toMap());
   }
@@ -194,7 +191,7 @@ class JPush {
   // 进入页面， pageName：页面名  请与pageLeave配套使用
   void pageEnterTo(String pageName) {
     print(flutter_log + "pageEnterTo:" + pageName);
-    if (!_platform.isIOS || isOHOS) return;
+    if (!Platform.isIOS) return;
 
     _channel.invokeMethod('pageEnterTo', pageName);
   }
@@ -203,7 +200,7 @@ class JPush {
   // 离开页面，pageName：页面名， 请与pageEnterTo配套使用
   void pageLeave(String pageName) {
     print(flutter_log + "pageLeave:" + pageName);
-    if (!_platform.isIOS || isOHOS) return;
+    if (!Platform.isIOS) return;
 
     _channel.invokeMethod('pageLeave', pageName);
   }
@@ -386,7 +383,7 @@ class JPush {
   }
 
   Future clearLocalNotifications() async {
-    if (_platform.isIOS || isOHOS) return;
+    if (Platform.isIOS || isOHOS) return;
 
     print(flutter_log + "clearLocalNotifications:");
     await _channel.invokeMethod('clearLocalNotifications');
@@ -462,7 +459,7 @@ class JPush {
   }
 
   void requestRequiredPermission() {
-    if (_platform.isIOS || isOHOS) return;
+    if (Platform.isIOS || isOHOS) return;
 
     _channel.invokeMethod('requestRequiredPermission');
   }
