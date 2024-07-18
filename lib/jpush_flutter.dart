@@ -15,7 +15,7 @@ class JPush {
   final MethodChannel _channel;
 
   @visibleForTesting
-  JPush.private(MethodChannel channel, Platform platform) : _channel = channel;
+  JPush.private(MethodChannel channel) : _channel = channel;
 
   static final JPush _instance =
       new JPush.private(const MethodChannel('jpush'));
