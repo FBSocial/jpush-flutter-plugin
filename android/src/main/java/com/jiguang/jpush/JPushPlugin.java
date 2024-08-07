@@ -3,7 +3,9 @@ package com.jiguang.jpush;
 import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -562,6 +564,16 @@ public class JPushPlugin implements FlutterPlugin, MethodCallHandler, ActivityAw
             String alert = intent.getStringExtra(JPushInterface.EXTRA_ALERT);
             Map<String, Object> extras = getNotificationExtras(intent);
             JPushHelper.getInstance().transmitNotificationOpen(title, alert, extras);
+            ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+            List<ActivityManager.RunningTaskInfo> taskList = activityManager.getRunningTasks(100); // 获得当前运行的task
+            String packageName = context.getPackageName();
+            for (ActivityManager.RunningTaskInfo taskInfo : taskList) {
+// 找到当前应用的task，并启动task的栈顶activity，达到程序切换到前台
+                if (taskInfo.topActivity.getPackageName().equals(packageName)) {
+                    activityManager.moveTaskToFront(taskInfo.id, 0);
+                    break;
+                }
+            }
         }
 
         private void handlingNotificationReceive(Context context, Intent intent) {
