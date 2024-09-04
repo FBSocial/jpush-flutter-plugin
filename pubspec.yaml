@@ -26,6 +26,9 @@ flutter:
       android:
         package: com.jiguang.jpush
         pluginClass: JPushPlugin
+      ohos:
+        package: com.jiguang.jpush
+        pluginClass: JpushPlugin
       ios:
         pluginClass: JPushPlugin
 

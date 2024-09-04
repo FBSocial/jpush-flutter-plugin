@@ -1,0 +1,12 @@
+{
+  "name": "entry",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "",
+  "author": "",
+  "license": "",
+  "dependencies": {
+    "jpush_flutter": "file:../har/jpush_flutter.har",
+    "@jg/push": "1.1.0"
+  }
+}
