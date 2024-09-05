@@ -116,7 +116,7 @@ export default class JpushPlugin implements FlutterPlugin, MethodCallHandler {
     for (let key of extra.keys()) {
       record[key] = extra.get(key)
     }
-    console.log(this.TAG, "sendLocalPush title: " + title);
+    console.log(this.TAG, "sendLocalPush - title: " + title);
     let wantAgentInfo: wantAgent.WantAgentInfo = {
       wants: [
         {
@@ -140,7 +140,8 @@ export default class JpushPlugin implements FlutterPlugin, MethodCallHandler {
       },
       deliveryTime: new Date().getTime(),
       showDeliveryTime: true,
-      wantAgent: wantAgentObj
+      wantAgent: wantAgentObj,
+      notificationSlotType: notificationManager.SlotType.SOCIAL_COMMUNICATION
     };
     notificationManager.publish(notificationRequest);
   }
