@@ -1,4 +1,5 @@
 import {
+  Any,
   FlutterPlugin,
   FlutterPluginBinding,
   MethodCall,
@@ -7,14 +8,16 @@ import {
   MethodResult,
 } from '@ohos/flutter_ohos';
 import { JPushInterface } from '@jg/push';
-import { abilityAccessCtrl, bundleManager, Permissions } from '@kit.AbilityKit';
-import { BusinessError } from '@kit.BasicServicesKit';
+import { abilityAccessCtrl, bundleManager, common, Permissions, Want, wantAgent } from '@kit.AbilityKit';
+import { notificationManager } from '@kit.NotificationKit';
+import { HashMap } from '@kit.ArkTS';
+import { when } from '@ohos/hypium';
 
-/** JpushPlugin **/
 export default class JpushPlugin implements FlutterPlugin, MethodCallHandler {
   private channel: MethodChannel | null = null;
   public TAG = "JpushPlugin";
   private sequence: number = 0;
+  private packageName = "com.idreamsky.fanbook"
 
   constructor() {
   }
@@ -40,7 +43,7 @@ export default class JpushPlugin implements FlutterPlugin, MethodCallHandler {
     if (method == "getPlatformVersion") {
       result.success("OpenHarmony ^ ^ ")
     } else if (method == "setAuth" || method == "setup" || method == "getLaunchAppNotification"
-      || method == "applyPushAuthority" || method == "sendLocalNotification" || method == "clearAllNotifications"
+      || method == "applyPushAuthority" || method == "clearAllNotifications"
       || method == "clearNotification" || method == "getBadge") {
       //这些方法，极光sdk未提供，直接返回成功
       result.success(null)
@@ -64,51 +67,86 @@ export default class JpushPlugin implements FlutterPlugin, MethodCallHandler {
       console.log(this.TAG, "tags: " + tags.join("-"));
     } else if (method == "setAlias") {
       let alias = call.args as string;
-      JPushInterface.setAlias(this.sequence++, alias)
-      result.success(null)
-      console.log(this.TAG, "alias: " + alias);
+      JPushInterface.setAlias(this.sequence++, alias);
+      let map: HashMap<string, string> = new HashMap();
+      map.set("alias", alias);
+      result.success(map);
+      console.log(this.TAG, "setAlias: " + alias);
     } else if (method == "isNotificationEnabled") {
       //是否打开通知开关
-      let isEnabled = this.checkPushPermission()
-      result.success(isEnabled)
-      console.log(this.TAG, "isNotificationEnabled isEnabled: " + isEnabled);
+      let isEnabled = notificationManager.isNotificationEnabledSync();
+      let map: HashMap<string, boolean> = new HashMap();
+      map.set("isEnabled", isEnabled);
+      result.success(map)
+      console.log(this.TAG, "isNotificationEnabled -> isEnabled: " + isEnabled);
     } else if (method == "openSettingsForNotification") {
-      //打开通知设置
+      let wantInfo: Want = {
+        deviceId: '', // deviceId为空表示本设备
+        bundleName: 'com.huawei.hmos.settings',
+        abilityName: 'com.huawei.hmos.settings.MainAbility',
+        uri: 'application_info_entry',
+        parameters: {
+          pushParams: this.packageName
+        }
+      }
+      let context = getContext(this) as common.UIAbilityContext
+      context.startAbility(wantInfo)
+      result.success(null)
+    } else if (method == "sendLocalNotification") {
+      this.sendLocalPush(call)
       result.success(null)
     } else {
       result.notImplemented()
     }
-    console.log(this.TAG, "onMethodCall: " + method + " - end");
+    console.log(this.TAG, "onMethodCall: " + method + " - end")
   }
 
-  checkAccessToken(permission: Permissions): abilityAccessCtrl.GrantStatus {
-    let atManager: abilityAccessCtrl.AtManager = abilityAccessCtrl.createAtManager();
-    let grantStatus: abilityAccessCtrl.GrantStatus = abilityAccessCtrl.GrantStatus.PERMISSION_DENIED;
-    // 获取应用程序的accessTokenID
-    let tokenId: number = 0;
-    try {
-      let bundleInfo = bundleManager.getBundleInfoForSelfSync(bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_APPLICATION)
-      // let bundleInfo =
-      //   await bundleManager.getBundleInfoForSelf(bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_APPLICATION);
-      let appInfo = bundleInfo.appInfo;
-      tokenId = appInfo.accessTokenId;
-    } catch (err) {
-      console.error(this.TAG, `checkAccessToken error：${err.code}, ${err.message}`);
+  /**
+   * 发本地push
+   */
+  async sendLocalPush(call: MethodCall): Promise<void> {
+    let map = call.args as HashMap<string, Object>;
+    let id: number = map.get('id') as number;
+    let title = map.get('title') as string;
+    let content = map.get('content') as string;
+    let extra = map.get('extra') as HashMap<string, string>;
+    let record: Record<string, string> = {};
+    //本地在线push的标记
+    record['jpush_local'] = '1'
+    for (let key of extra.keys()) {
+      record[key] = extra.get(key)
     }
-
-    // 校验应用是否被授予权限
-    try {
-      grantStatus = atManager.verifyAccessTokenSync(tokenId, permission);
-    } catch (err) {
-      console.error(this.TAG, `verifyAccessTokenSync error：${err.code}, ${err.message}`);
+    console.log(this.TAG, "sendLocalPush title: " + title);
+    let wantAgentInfo: wantAgent.WantAgentInfo = {
+      wants: [
+        {
+          bundleName: this.packageName,
+          abilityName: "EntryAbility",
+          parameters: record,
+        }
+      ],
+      operationType: wantAgent.OperationType.START_ABILITIES,
+      requestCode: 1,
     }
-    return grantStatus;
+    const wantAgentObj = await wantAgent.getWantAgent(wantAgentInfo)
+    let notificationRequest: notificationManager.NotificationRequest = {
+      id: id,
+      content: {
+        notificationContentType: notificationManager.ContentType.NOTIFICATION_CONTENT_BASIC_TEXT, // 普通文本类型通知
+        normal: {
+          title: title,
+          text: content
+        },
+      },
+      deliveryTime: new Date().getTime(),
+      showDeliveryTime: true,
+      wantAgent: wantAgentObj
+    };
+    notificationManager.publish(notificationRequest);
   }
 
-  //检查是否打开通知开关
-  checkPushPermission(): boolean {
-    const permissions: Array<Permissions> = ['ohos.permission.ACCESS_NOTIFICATION_POLICY'];
-    let grantStatus = this.checkAccessToken(permissions[0]);
-    return grantStatus === abilityAccessCtrl.GrantStatus.PERMISSION_GRANTED;
+  callbackFlutter(method: string, data: Any) {
+    console.log(this.TAG, "callbackFlutter method:" + method + " data:" + data)
+    this.channel?.invokeMethod(method, data)
   }
 }
