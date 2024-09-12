@@ -70,6 +70,11 @@ export default class JpushPlugin implements FlutterPlugin, MethodCallHandler {
       this.callbackMap.set(seq, result);
       JPushInterface.setAlias(seq, alias);
       console.log(this.TAG, "setAlias: " + alias + " seq:" + seq);
+    } else if (method == "deleteAlias") {
+      let seq = this.sequence++;
+      this.callbackMap.set(seq, result);
+      JPushInterface.deleteAlias(seq)
+      console.log(this.TAG, "deleteAlias seq:" + seq);
     } else if (method == "isNotificationEnabled") {
       //是否打开通知开关
       let isEnabled = notificationManager.isNotificationEnabledSync();
