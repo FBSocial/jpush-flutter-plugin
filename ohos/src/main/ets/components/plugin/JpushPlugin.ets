@@ -83,19 +83,11 @@ export default class JpushPlugin implements FlutterPlugin, MethodCallHandler {
       result.success(map)
       console.log(this.TAG, "isNotificationEnabled -> isEnabled: " + isEnabled);
     } else if (method == "openSettingsForNotification") {
-      let wantInfo: Want = {
-        deviceId: '', // deviceId为空表示本设备
-        bundleName: 'com.huawei.hmos.settings',
-        abilityName: 'com.huawei.hmos.settings.MainAbility',
-        uri: 'systemui_notification_settings', //应用的通知设置入口
-        parameters: {
-          pushParams: {
-            bundleName: this.packageName
-          }
-        }
-      }
-      let context = getContext(this) as common.UIAbilityContext
-      context.startAbility(wantInfo)
+      this.openSettingsForNotification()
+      result.success(null)
+    } else if (method == "requestRequiredPermission") {
+      console.log(this.TAG, "requestRequiredPermission --->");
+      this.requestEnableNotification()
       result.success(null)
     } else if (method == "sendLocalNotification") {
       this.sendLocalPush(call)
@@ -182,5 +174,32 @@ export default class JpushPlugin implements FlutterPlugin, MethodCallHandler {
       }
       this.callbackMap.remove(seq)
     }
+  }
+
+  /**
+   * 申请打开应用的通知开关
+   */
+  requestEnableNotification() {
+    let context = getContext(this) as common.UIAbilityContext
+    notificationManager.requestEnableNotification(context)
+  }
+
+  /**
+   * 打开应用的通知系统设置页
+   */
+  openSettingsForNotification() {
+    let wantInfo: Want = {
+      deviceId: '', // deviceId为空表示本设备
+      bundleName: 'com.huawei.hmos.settings',
+      abilityName: 'com.huawei.hmos.settings.MainAbility',
+      uri: 'systemui_notification_settings', //应用的通知设置入口
+      parameters: {
+        pushParams: {
+          bundleName: this.packageName
+        }
+      }
+    }
+    let context = getContext(this) as common.UIAbilityContext
+    context.startAbility(wantInfo)
   }
 }
